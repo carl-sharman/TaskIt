@@ -15,7 +15,6 @@ class TaskDetailViewController: UIViewController {
     @IBOutlet weak var dueDatePicker: UIDatePicker!
     
     var detailTaskModel: TaskModel!
-    var mainVC: ViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +22,7 @@ class TaskDetailViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         self.taskTextField.text = detailTaskModel.task
-        self.subtaskTextField.text = detailTaskModel.subTask
+        self.subtaskTextField.text = detailTaskModel.subtask
         self.dueDatePicker.date = detailTaskModel.date
     }
 
@@ -38,10 +37,15 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func doneBarButtonItemPressed(sender: UIBarButtonItem) {
-        // Update the task array 
-        var task = TaskModel(task: self.taskTextField.text, subTask: self.subtaskTextField.text, date: self.dueDatePicker.date, completed: false)
         
-        self.mainVC.baseArray[0][mainVC.tableView.indexPathForSelectedRow()!.row] = task
+        // Update the task in the modl
+        let  appDelegate = (UIApplication.sharedApplication().delegate as AppDelegate)
+        self.detailTaskModel.task = self.taskTextField.text
+        self.detailTaskModel.subtask = self.subtaskTextField.text
+        self.detailTaskModel.date = self.dueDatePicker.date
+        self.detailTaskModel.completed = self.detailTaskModel.completed
+        
+        appDelegate.saveContext()
         
         // Dismiss view from within the navigation stack
         self.navigationController?.popViewControllerAnimated(true)

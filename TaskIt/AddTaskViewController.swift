@@ -7,10 +7,9 @@
 //
 
 import UIKit
+import CoreData
 
 class AddTaskViewController: UIViewController {
-
-    var mainVC: ViewController!
     
     @IBOutlet weak var taskTextField: UITextField!
     @IBOutlet weak var subtaskTextField: UITextField!
@@ -33,9 +32,30 @@ class AddTaskViewController: UIViewController {
     }
     
     @IBAction func addTaskButtonTapped(sender: UIButton) {
-        // Create new task, add to task array in main view controller and dismiss this view
-        var task = TaskModel(task: self.taskTextField.text, subTask: self.subtaskTextField.text, date: self.dueDatePicker.date, completed: false)
-        self.mainVC.baseArray[0].append(task)
+        // Access the data model context and description
+        let appDelegate = (UIApplication.sharedApplication().delegate as AppDelegate)
+        let managedObjectContext = appDelegate.managedObjectContext
+        let entityDescription = NSEntityDescription.entityForName("TaskModel", inManagedObjectContext: managedObjectContext!)
+        
+        // Create new task
+        let task = TaskModel(entity: entityDescription!, insertIntoManagedObjectContext: managedObjectContext!)
+        task.task = taskTextField.text
+        task.subtask = subtaskTextField.text
+        task.date = dueDatePicker.date
+        task.completed = false
+        
+        // Save entity changes
+        appDelegate.saveContext()
+        
+        var request = NSFetchRequest(entityName: "TaskModel")
+        var error: NSError? = nil
+        var results: NSArray = managedObjectContext!.executeFetchRequest(request, error: &error)!
+        
+        for res in results {
+            println(res)
+        }
+        
+        // Dismiss this view
         self.dismissViewControllerAnimated(true, completion: nil)
     }
 }
